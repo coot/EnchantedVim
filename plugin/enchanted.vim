@@ -112,11 +112,12 @@ fun! s:VeryMagicGlobal(dispatcher)
 endfun
 call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicGlobal'))
 
-fun! s:VeryMagicVimGrep(cmdline)
-    if !g:VeryMagicVimGrep
-	return a:cmdline
+fun! s:VeryMagicVimGrep(dispatcher)
+    " a:dispatcher: is crdispatcher#CRDispatcher dict
+    if !g:VeryMagicVimGrep || a:dispatcher.cmdtype !=# ':'
+	return
     endif
-    let cmdline = a:cmdline
+    let cmdline = a:dispatcher.cmdline
     let pat = '^\([:\s]*'.
 		    \ '\%(vim\%[grep]\|lv\%[imgrep]\)!\?'.
 		    \ '\s*\([^a-zA-Z_1-9]\)'.
@@ -128,6 +129,6 @@ fun! s:VeryMagicVimGrep(cmdline)
 	    let cmdline = matches[1].'\v'.matches[3].matches[4]
 	endif
     endif
-    return cmdline
+    let a:dispatcher.cmdline = cmdline
 endfun
-call add(crdispatcher#CRDispatcher[':'], function('s:VeryMagicVimGrep'))
+call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicVimGrep'))
