@@ -130,6 +130,7 @@ fun! s:VeryMagicVimGrep(cmdline)
     if !g:VeryMagicVimGrep
 	return a:cmdline
     endif
+    let cmdline = a:cmdline
     let pat = '^\([:\s]*'.
 		    \ '\%(vim\%[grep]\|lv\%[imgrep]\)!\?'.
 		    \ '\s*\([^a-zA-Z_1-9]\)'.
@@ -143,3 +144,4 @@ fun! s:VeryMagicVimGrep(cmdline)
     endif
     return cmdline
 endfun
+call add(crdispatcher#CRDispatcher[':'], function('s:VeryMagicVimGrep'))
