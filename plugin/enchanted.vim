@@ -90,13 +90,11 @@ fun! s:VeryMagicSubstitute(dispatcher)
 endfun
 call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSubstitute'))
 
-fun! s:VeryMagicGlobal(cmdline)
-    if !g:VeryMagicGlobal
-	return a:cmdline
+fun! s:VeryMagicGlobal(dispatcher)
+    " a:dispatcher: is crdispatcher#CRDispatcher dict
+    if !g:VeryMagicGlobal || a:dispatcher.cmdtype !=# ':'
+	return
     endif
-    let cmdlines = split(a:cmdline, '\\\@<!|')
-    let n_cmdlines = []
-    for cmdline in cmdlines
 	let pat = '^\([:\s]*'.
 			\ s:range_pattern.
 			\ '\%(g\%[lobal]\|v\%[global]\)!\?'.
@@ -109,11 +107,10 @@ fun! s:VeryMagicGlobal(cmdline)
 		let cmdline = matches[1].'\v'.matches[3].matches[4]
 	    endif
 	endif
-	call add(n_cmdlines, cmdline)
-    endfor
-    return join(n_cmdlines, '|')
+    endif
+    let a:dispatcher.cmdline = cmdline
 endfun
-call add(crdispatcher#CRDispatcher[':'], function('s:VeryMagicGlobal'))
+call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicGlobal'))
 
 fun! s:VeryMagicVimGrep(cmdline)
     if !g:VeryMagicVimGrep
