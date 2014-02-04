@@ -44,6 +44,28 @@ call add(crdispatcher#CRDispatcher['/'], function('s:VeryMagicSearch'))
 call add(crdispatcher#CRDispatcher['?'], function('s:VeryMagicSearch'))
 
 
+let s:range_pattern = '\%('.
+		\ '%\|'.
+		\ '\$\|'.
+		\ '\.\|'.
+		\ '\\&\|'.
+		\ '\d\+\|'.
+		\ "'".'[a-zA-Z]\|'.
+		\ '\/.\{-}\/\?'.
+		\ '\|?.\{-}?\?'.
+	    \ '\)\s*'.
+	    \ '\%(,\s*'.
+		\ '\%('.
+		    \ '\.\|'.
+		    \ '\$\|'.
+		    \ "'".'[a-zA-Z]\|'.
+		    \ '\\&\|'.
+		    \ '\d\+\|'.
+		    \ '\/.\{-}\/\?\|'.
+		    \ '?.\{-}?\?'.
+		\ '\)\s*'.
+	    \ '\)\?'
+
 fun! s:VeryMagicSubstitute(cmdline)
     if !g:VeryMagicSubstitute
 	return a:cmdline
@@ -51,10 +73,18 @@ fun! s:VeryMagicSubstitute(cmdline)
     let cmdlines = split(a:cmdline, '\\\@<!|')
     let n_cmdlines = []
     for cmdline in cmdlines
-	let pat = '^\([:\s]*s\%[ubstitute]\s*\([^a-z1-9]\)\)\(.\{-}\)\(\2.*\)'
+	let pat = '^\([:\s]*'.
+			\ s:range_pattern.
+			\ 's\%[ubstitute]\s*'.
+			\ '\([^a-zA-Z_1-9]\)'.
+		\ '\)'.
+		\ '\(.\{-}\)'.
+		\ '\(\2.*\)'
 	let matches = matchlist(cmdline, pat)
 	if !empty(matches)
-	    let cmdline = matches[1].'\v'.matches[3].matches[4]
+	    if matches[3] !~# '^\\v'
+		let cmdline = matches[1].'\v'.matches[3].matches[4]
+	    endif
 	endif
 	call add(n_cmdlines, cmdline)
     endfor
@@ -69,10 +99,17 @@ fun! s:VeryMagicGlobal(cmdline)
     let cmdlines = split(a:cmdline, '\\\@<!|')
     let n_cmdlines = []
     for cmdline in cmdlines
-	let pat = '^\([:\s]*\%(g\%[lobal]\|v\%[global]\)\s*\([^a-z1-9]\)\)\(.\{-}\)\(\2.*\)'
+	let pat = '^\([:\s]*'.
+			\ s:range_pattern.
+			\ '\%(g\%[lobal]\|v\%[global]\)!\?'.
+			\ '\s*\([^a-zA-Z_1-9]\)'.
+		\ '\)'.
+		\ '\(.\{-}\)\(\2.*\)'
 	let matches = matchlist(cmdline, pat)
 	if !empty(matches)
-	    let cmdline = matches[1].'\v'.matches[3].matches[4]
+	    if matches[3] !~# '^\\v'
+		let cmdline = matches[1].'\v'.matches[3].matches[4]
+	    endif
 	endif
 	call add(n_cmdlines, cmdline)
     endfor
