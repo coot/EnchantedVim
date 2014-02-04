@@ -116,9 +116,3 @@ fun! s:VeryMagicGlobal(cmdline)
     return join(n_cmdlines, '|')
 endfun
 call add(crdispatcher#CRDispatcher[':'], function('s:VeryMagicGlobal'))
-
-cno <C-M> <CR>
-if empty(maparg('<Plug>CRDispatch', 'c'))
-    cno <Plug>CRDispatch <C-\>eCRDispatch()<CR><CR>
-endif
-cm <CR> <Plug>CRDispatch
