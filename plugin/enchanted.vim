@@ -95,17 +95,17 @@ fun! s:VeryMagicGlobal(dispatcher)
     if !g:VeryMagicGlobal || a:dispatcher.cmdtype !=# ':'
 	return
     endif
-	let pat = '^\([:\s]*'.
-			\ s:range_pattern.
-			\ '\%(g\%[lobal]\|v\%[global]\)!\?'.
-			\ '\s*\([^a-zA-Z_1-9]\)'.
-		\ '\)'.
-		\ '\(.\{-}\)\(\2.*\)'
-	let matches = matchlist(cmdline, pat)
-	if !empty(matches)
-	    if matches[3] !~# '^\\v'
-		let cmdline = matches[1].'\v'.matches[3].matches[4]
-	    endif
+    let cmdline = a:dispatcher.cmdline
+    let pat = '^\([:\s]*'.
+		    \ s:range_pattern.
+		    \ '\%(g\%[lobal]\|v\%[global]\)!\?'.
+		    \ '\s*\([^a-zA-Z_1-9]\)'.
+	    \ '\)'.
+	    \ '\(.\{-}\)\(\2.*\)'
+    let matches = matchlist(cmdline, pat)
+    if !empty(matches)
+	if matches[3] !~# '^\\v'
+	    let cmdline = matches[1].'\v'.matches[3].matches[4]
 	endif
     endif
     let a:dispatcher.cmdline = cmdline
