@@ -13,7 +13,8 @@
 " More over ther is a very magic global and vglobal:
 "   let g:VeryMagicGlobal = 1 (default is 0)
 " HowItWorks: it simply injects \v at the begining of your pattern after you
-" press enter (or in the pattern of your substitute command).
+" press enter.
+"
 " Note: if you are using one of the two other of my plugins which are defining
 " maps to <CR> in the command line, you need to update them to the latest
 " version so that they will all work:
@@ -32,48 +33,16 @@ if !exists('g:VeryMagicGlobal')
     let g:VeryMagicGlobal = 0
 endif
 
-if !exists('CRDispatcher')
-    let g:CRDispatcher = {
-	\ 'expr': [],
-	\ 'search': [],
-	\ }
-    fun! g:CRDispatcher.dispatch() dict
-	let cmdtype = getcmdtype()
-	if cmdtype == ':'
-	    let key = 'expr'
-	elseif cmdtype == '/'
-	    let key = 'search'
-	else
-	    return getcmdline()
-	endif
-	if has_key(self, key)
-	    let Expr = get(self, key)
-	    if type(Expr) == 3
-		let res = getcmdline()
-		for F in Expr
-		    let res = F(res)
-		endfor
-		return res
-	    else
-		return self[key]()
-	    endif
-	 endif
-	return getcmdline()
-    endfun
-endif
-if !exists('*CRDispatch')
-    fun CRDispatch()
-	return g:CRDispatcher.dispatch()
-    endfun
-endif
-
 fun! s:VeryMagicSearch(cmdline)
-    if g:VeryMagic && a:cmdline !~# '^\\v'
+    if g:VeryMagic && !empty(a:cmdline) && a:cmdline !~# '^\\v'
 	return '\v'.a:cmdline
     else
 	return a:cmdline
     endif
 endfun
+call add(crdispatcher#CRDispatcher['/'], function('s:VeryMagicSearch'))
+call add(crdispatcher#CRDispatcher['?'], function('s:VeryMagicSearch'))
+
 
 fun! s:VeryMagicSubstitute(cmdline)
     if !g:VeryMagicSubstitute
@@ -91,6 +60,7 @@ fun! s:VeryMagicSubstitute(cmdline)
     endfor
     return join(n_cmdlines, '|')
 endfun
+call add(crdispatcher#CRDispatcher[':'], function('s:VeryMagicSubstitute'))
 
 fun! s:VeryMagicGlobal(cmdline)
     if !g:VeryMagicGlobal
@@ -108,10 +78,7 @@ fun! s:VeryMagicGlobal(cmdline)
     endfor
     return join(n_cmdlines, '|')
 endfun
-
-call add(CRDispatcher['search'], function('s:VeryMagicSearch'))
-call add(CRDispatcher['expr'], function('s:VeryMagicSubstitute'))
-call add(CRDispatcher['expr'], function('s:VeryMagicGlobal'))
+call add(crdispatcher#CRDispatcher[':'], function('s:VeryMagicGlobal'))
 
 cno <C-M> <CR>
 if empty(maparg('<Plug>CRDispatch', 'c'))
