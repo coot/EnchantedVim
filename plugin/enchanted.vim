@@ -116,3 +116,21 @@ fun! s:VeryMagicGlobal(cmdline)
     return join(n_cmdlines, '|')
 endfun
 call add(crdispatcher#CRDispatcher[':'], function('s:VeryMagicGlobal'))
+
+fun! s:VeryMagicVimGrep(cmdline)
+    if !g:VeryMagicVimGrep
+	return a:cmdline
+    endif
+    let pat = '^\([:\s]*'.
+		    \ '\%(vim\%[grep]\|lv\%[imgrep]\)!\?'.
+		    \ '\s*\([^a-zA-Z_1-9]\)'.
+	    \ '\)'.
+	    \ '\(.\{-}\)\(\2.*\)'
+    let matches = matchlist(cmdline, pat)
+    if !empty(matches)
+	if matches[3] !~# '^\\v'
+	    let cmdline = matches[1].'\v'.matches[3].matches[4]
+	endif
+    endif
+    return cmdline
+endfun
