@@ -43,6 +43,15 @@ endfun
 call add(crdispatcher#CRDispatcher['/'], function('s:VeryMagicSearch'))
 call add(crdispatcher#CRDispatcher['?'], function('s:VeryMagicSearch'))
 
+fun! SearchCmdWin()
+    " Adjust <c-f> when a pattern is written in the command line.
+    let line = getline(line('.'))
+    if !empty(line) && line !~# '^\\v'
+	call setline(line('.'), '\v' . line)
+    endif
+endfun
+nm <Plug>SearchCmdWin :call SearchCmdWin()<cr>
+cm <expr> <c-f> getcmdtype() == '/' ? '<c-f><Plug>SearchCmdWin' : '<c-f>'
 
 let s:range_pattern = '\%('.
 		\ '%\|'.
