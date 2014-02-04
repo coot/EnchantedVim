@@ -33,11 +33,14 @@ if !exists('g:VeryMagicGlobal')
     let g:VeryMagicGlobal = 0
 endif
 
-fun! s:VeryMagicSearch(cmdline)
-    if g:VeryMagic && !empty(a:cmdline) && a:cmdline !~# '^\\v'
-	return '\v'.a:cmdline
-    else
-	return a:cmdline
+fun! s:VeryMagicSearch(dispatcher)
+    " a:dispatcher: is crdispatcher#CRDispatcher dict
+    if !(a:dispatcher.cmdtype ==# '/' || a:dispatcher.cmdtype ==# '?')
+	return
+    endif
+    let cmdline = a:dispatcher.cmdline
+    if g:VeryMagic && !empty(cmdline) && cmdline !~# '^\\v'
+	let a:dispatcher.cmdline = '\v'.cmdline
     endif
 endfun
 call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearch'))
