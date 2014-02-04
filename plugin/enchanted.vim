@@ -40,26 +40,7 @@ fun! s:VeryMagicSearch(cmdline)
 	return a:cmdline
     endif
 endfun
-call add(crdispatcher#CRDispatcher['/'], function('s:VeryMagicSearch'))
-call add(crdispatcher#CRDispatcher['?'], function('s:VeryMagicSearch'))
-
-fun! CmdWindow()
-    " Adjust <c-f> when a pattern is written in the command line.
-    let line = getline(line('.'))
-    let line_len = len(line)
-    if !empty(line) && line !~# '^\\v'
-	let line = g:CRDispatcher.dispatch(line)
-	call setline(line('.'), line) 
-    endif
-    " TODO: might move the cursor if it is before the inserted characters
-    " better use marks
-    let diff = len(line) - line_len
-    if diff > 0
-	exe "normal ".(diff)."l"
-    endif
-endfun
-nm <silent> <Plug>CmdWindow :call CmdWindow()<cr>
-cm <c-f> <c-f><Plug>CmdWindow
+call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearch'))
 
 let s:range_pattern = '\%('.
 		\ '%\|'.
