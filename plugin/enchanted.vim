@@ -43,15 +43,23 @@ endfun
 call add(crdispatcher#CRDispatcher['/'], function('s:VeryMagicSearch'))
 call add(crdispatcher#CRDispatcher['?'], function('s:VeryMagicSearch'))
 
-fun! SearchCmdWin()
+fun! CmdWindow()
     " Adjust <c-f> when a pattern is written in the command line.
     let line = getline(line('.'))
+    let line_len = len(line)
     if !empty(line) && line !~# '^\\v'
-	call setline(line('.'), '\v' . line)
+	let line = g:CRDispatcher.dispatch(line)
+	call setline(line('.'), line) 
+    endif
+    " TODO: might move the cursor if it is before the inserted characters
+    " better use marks
+    let diff = len(line) - line_len
+    if diff > 0
+	exe "normal ".(diff)."l"
     endif
 endfun
-nm <Plug>SearchCmdWin :call SearchCmdWin()<cr>
-cm <expr> <c-f> getcmdtype() == '/' ? '<c-f><Plug>SearchCmdWin' : '<c-f>'
+nm <silent> <Plug>CmdWindow :call CmdWindow()<cr>
+cm <c-f> <c-f><Plug>CmdWindow
 
 let s:range_pattern = '\%('.
 		\ '%\|'.
