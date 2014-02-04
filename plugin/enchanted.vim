@@ -67,31 +67,28 @@ let s:range_pattern = '\%('.
 		\ '\)\s*'.
 	    \ '\)\?'
 
-fun! s:VeryMagicSubstitute(cmdline)
-    if !g:VeryMagicSubstitute
-	return a:cmdline
+fun! s:VeryMagicSubstitute(dispatcher)
+    " a:dispatcher: is crdispatcher#CRDispatcher dict
+    if !g:VeryMagicSubstitute || a:dispatcher.cmdtype !=# ':'
+	return
     endif
-    let cmdlines = split(a:cmdline, '\\\@<!|')
-    let n_cmdlines = []
-    for cmdline in cmdlines
-	let pat = '^\([:\s]*'.
-			\ s:range_pattern.
-			\ 's\%[ubstitute]\s*'.
-			\ '\([^a-zA-Z_1-9]\)'.
-		\ '\)'.
-		\ '\(.\{-}\)'.
-		\ '\(\2.*\)'
-	let matches = matchlist(cmdline, pat)
-	if !empty(matches)
-	    if matches[3] !~# '^\\v'
-		let cmdline = matches[1].'\v'.matches[3].matches[4]
-	    endif
+    let cmdline = a:dispatcher.cmdline
+    let pat = '^\([:\s]*'.
+		    \ s:range_pattern.
+		    \ 's\%[ubstitute]\s*'.
+		    \ '\([^a-zA-Z_1-9]\)'.
+	    \ '\)'.
+	    \ '\(.\{-}\)'.
+	    \ '\(\2.*\)'
+    let matches = matchlist(cmdline, pat)
+    if !empty(matches)
+	if matches[3] !~# '^\\v'
+	    let cmdline = matches[1].'\v'.matches[3].matches[4]
 	endif
-	call add(n_cmdlines, cmdline)
-    endfor
-    return join(n_cmdlines, '|')
+    endif
+    let a:dispatcher.cmdline = cmdline
 endfun
-call add(crdispatcher#CRDispatcher[':'], function('s:VeryMagicSubstitute'))
+call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSubstitute'))
 
 fun! s:VeryMagicGlobal(cmdline)
     if !g:VeryMagicGlobal
