@@ -32,6 +32,14 @@ endif
 if !exists('g:VeryMagicGlobal')
     let g:VeryMagicGlobal = 0
 endif
+if !exists('g:VeryMagicArg')
+    let g:VeryMagicArg = 0
+endif
+if !exists('g:VeryMagicEscapeBackslashesInSearchArg')
+    " This is very experimental. It has to detect when to escape the pattern
+    " to not double escape it.
+    let g:VeryMagicEscapeBackslashesInSearchArg = 0
+endif
 
 fun! s:VeryMagicSearch(dispatcher)
     " a:dispatcher: is crdispatcher#CRDispatcher dict
@@ -138,3 +146,38 @@ fun! s:VeryMagicVimGrep(dispatcher)
     let a:dispatcher.cmdline = cmdline
 endfun
 call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicVimGrep'))
+
+fun! s:VeryMagicSearchArg(dispatcher)
+    if (!g:VeryMagicSearchArg && !g:VeryMagicEscapeBackslashesInSearchArg) || a:dispatcher.cmdtype !=# ':'
+	return
+    endif
+    let cmdline = a:dispatcher.cmdline
+    let pat = '^\v([[:space:]:]*'.
+		    \ '%('.
+			\ 'e%[dit]!?|'.
+			\ 'view?!?|'.
+			\ 'vi%[sual]!?|'.
+			\ 'ex|'.
+			\ '\d*\s+find?!?'.
+		    \ ')'.
+		\ ')'.
+		\ '(.{-})'.
+		\ '(\s@1<=\+/\S@=)'.
+		\ '(%(\S|\\\s)+)'.
+		\ '(.*)'
+    let matches = matchlist(cmdline, pat)
+    if !empty(matches)
+	let pat = matches[4]
+	if g:VeryMagicEscapeBackslashesInSearchArg && pat =~# '\v(\\@1<!\\[^\\])'
+	    " TODO: it is not easy find a regex which detects if the pattern
+	    " should be escaped.  The current pattern matches if there is
+	    " a single '\'.
+	    let pat = escape(pat, '\')
+	endif
+	if g:VeryMagicSearchArg && pat !~# '^\\\\v'
+	    let pat = '\\v' . pat
+	endif
+	let a:dispatcher.cmdline = matches[1] . matches[2] . matches[3] . pat . matches[5]
+    endif
+endfun
+call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearchArg'))
