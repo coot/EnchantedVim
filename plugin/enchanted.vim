@@ -158,7 +158,7 @@ fun! s:VeryMagicSearchArg(dispatcher)
 			\ 'view?!?|'.
 			\ 'vi%[sual]!?|'.
 			\ 'ex|'.
-			\ '\d*\s+find?!?'.
+			\ '\d*\s*find?!?'.
 		    \ ')'.
 		\ ')'.
 		\ '(.{-})'.
