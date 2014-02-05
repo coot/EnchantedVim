@@ -46,27 +46,32 @@ endfun
 call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearch'))
 
 " TODO: /\d\+/-5,/\w\+/+5 will work, but I am not sure why.
-let s:range_pattern = '\%('.
-		\ '%\|'.
-		\ '\$\|'.
-		\ '\.\|'.
-		\ '\\&\|'.
-		\ '\d\+\|'.
-		\ "['`]".'[a-zA-Z<>\[\]'."'`".']\|'.
-		\ '\/.\{-}\/\?'.
-		\ '\|?.\{-}?\?'.
-	    \ '\)\s*'.
-	    \ '\%(,\s*'.
-		\ '\%('.
-		    \ '\.\|'.
-		    \ '\$\|'.
-		    \ "['`]".'[a-zA-Z<>\[\]'."'`".']\|'.
-		    \ '\\&\|'.
-		    \ '\d\+\|'.
-		    \ '\/.\{-}\/\?\|'.
-		    \ '?.\{-}?\?'.
-		\ '\)\s*'.
-	    \ '\)\?'
+let s:range_pattern = 
+	    \ '\v%('.
+		\ '%('.
+		    \ '\%|'.
+		    \ '\$|'.
+		    \ '\.|'.
+		    \ '\\\&|'.
+		    \ '\d+|'.
+		    \ "['`]".'[a-zA-Z<>\[\]'."'`".']|'.
+		    \ '/.{-}/|'.
+		    \ '\?.{-}\?'.
+		\ ')'.
+		\ '\s*%([\+-]\d+)?'.
+	    \ ')\s*' .
+	    \ '%([,;]\s*'.
+		\ '%('.
+		    \ '\.|'.
+		    \ '\$|'.
+		    \ "['`]".'[a-zA-Z<>\[\]'."'`".']|'.
+		    \ '\\\&|'.
+		    \ '\d+|'.
+		    \ '/.{-}/|'.
+		    \ '\?.{-}\?'.
+		\ ')\s*'.
+		\ '\s*%([\+-]\s+)?'.
+	    \ ')?'
 
 fun! s:VeryMagicSubstitute(dispatcher)
     " a:dispatcher: is crdispatcher#CRDispatcher dict
@@ -74,13 +79,13 @@ fun! s:VeryMagicSubstitute(dispatcher)
 	return
     endif
     let cmdline = a:dispatcher.cmdline
-    let pat = '^\([[:space:]:]*'.
-		    \ '\%('.s:range_pattern.'\)\?\s*'.
-		    \ 's\%[ubstitute]\s*'.
-		    \ '\([^a-zA-Z_1-9]\)'.
-	    \ '\)'.
-	    \ '\(.\{-}\)'.
-	    \ '\(\2.*\)'
+    let pat = '^\v([[:space:]:]*'.
+		    \ '%('.s:range_pattern.')?\s*'.
+		    \ 's%[ubstitute]\s*'.
+		    \ '([^a-zA-Z_1-9])'.
+	    \ ')'.
+	    \ '(.{-})'.
+	    \ '(\2.*)'
     let matches = matchlist(cmdline, pat)
     if !empty(matches)
 	if matches[3] !~# '^\\v' && len(matches[3])
@@ -97,12 +102,12 @@ fun! s:VeryMagicGlobal(dispatcher)
 	return
     endif
     let cmdline = a:dispatcher.cmdline
-    let pat = '^\([[:space:]:]*'.
-		    \ '\%('.s:range_pattern.'\)\?\s*'.
-		    \ '\%(g\%[lobal]\|v\%[global]\)!\?'.
-		    \ '\s*\([^a-zA-Z_1-9]\)'.
-	    \ '\)'.
-	    \ '\(.\{-}\)\(\2.*\)'
+    let pat = '^\v([[:space:]:]*'.
+		    \ '%('.s:range_pattern.')?\s*'.
+		    \ '%(g%[lobal]|v%[global])!?'.
+		    \ '\s*([^a-zA-Z_1-9])'.
+	    \ ')'.
+	    \ '(.{-})(\2.*)'
     let matches = matchlist(cmdline, pat)
     if !empty(matches)
 	if matches[3] !~# '^\\v' && len(matches[3])
@@ -120,11 +125,11 @@ fun! s:VeryMagicVimGrep(dispatcher)
 	return
     endif
     let cmdline = a:dispatcher.cmdline
-    let pat = '^\([:space:]:]*'.
-		    \ '\%(vim\%[grep]\|lv\%[imgrep]\)!\?'.
-		    \ '\s*\([^a-zA-Z_1-9]\)'.
-	    \ '\)'.
-	    \ '\(.\{-}\)\(\2.*\)'
+    let pat = '\v^([[:space:]:]*'.
+		    \ '%(vim%[grep]|lv%[imgrep])!?'.
+		    \ '\s*([^a-zA-Z_1-9])'.
+	    \ ')'.
+	    \ '(.{-})(\2.*)'
     let matches = matchlist(cmdline, pat)
     if !empty(matches)
 	if matches[3] !~# '^\\v' && len(matches[3])
