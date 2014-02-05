@@ -45,6 +45,7 @@ fun! s:VeryMagicSearch(dispatcher)
 endfun
 call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearch'))
 
+" TODO: /\d\+/-5,/\w\+/+5 will work, but I am not sure why.
 let s:range_pattern = '\%('.
 		\ '%\|'.
 		\ '\$\|'.
