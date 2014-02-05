@@ -120,7 +120,6 @@ call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicGlobal'))
 
 fun! s:VeryMagicVimGrep(dispatcher)
     " a:dispatcher: is crdispatcher#CRDispatcher dict
-    echom 'VeryMagicVimGrep'
     if !g:VeryMagicVimGrep || a:dispatcher.cmdtype !=# ':'
 	return
     endif
