@@ -83,7 +83,7 @@ fun! s:VeryMagicSubstitute(dispatcher)
 	    \ '\(\2.*\)'
     let matches = matchlist(cmdline, pat)
     if !empty(matches)
-	if matches[3] !~# '^\\v'
+	if matches[3] !~# '^\\v' && len(matches[3])
 	    let cmdline = matches[1].'\v'.matches[3].matches[4]
 	endif
     endif
@@ -105,7 +105,7 @@ fun! s:VeryMagicGlobal(dispatcher)
 	    \ '\(.\{-}\)\(\2.*\)'
     let matches = matchlist(cmdline, pat)
     if !empty(matches)
-	if matches[3] !~# '^\\v'
+	if matches[3] !~# '^\\v' && len(matches[3])
 	    let cmdline = matches[1].'\v'.matches[3].matches[4]
 	endif
     endif
@@ -127,7 +127,7 @@ fun! s:VeryMagicVimGrep(dispatcher)
 	    \ '\(.\{-}\)\(\2.*\)'
     let matches = matchlist(cmdline, pat)
     if !empty(matches)
-	if matches[3] !~# '^\\v'
+	if matches[3] !~# '^\\v' && len(matches[3])
 	    let cmdline = matches[1].'\v'.matches[3].matches[4]
 	endif
     endif
