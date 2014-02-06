@@ -1,0 +1,17 @@
+{
+    "name": "EnchantedVim",
+    "repository":  {
+	"type": "git",
+	"url": "git@github.com:coot/EnchantedVim.git",
+	"script-type": "plugin",
+	"vim_script_nr": 4849,
+    },
+    "dependencies": {
+	"CRDispatcher": {
+	    "type": "git",
+	    "url": "git@github.com:coot/CRDispatcher.git",
+	    "script-type": "plugin",
+	    "vim_script_nr": 4856,
+	},
+    },
+}
