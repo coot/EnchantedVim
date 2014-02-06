@@ -42,6 +42,7 @@ if !exists('g:VeryMagicEscapeBackslashesInSearchArg')
 endif
 
 fun! s:VeryMagicSearch(dispatcher)
+    " / and ? commands
     " a:dispatcher: is crdispatcher#CRDispatcher dict
     if !(a:dispatcher.cmdtype ==# '/' || a:dispatcher.cmdtype ==# '?')
 	return
@@ -82,6 +83,7 @@ let s:range_pattern =
 	    \ ')?'
 
 fun! s:VeryMagicSubstitute(dispatcher)
+    " :substitute command
     " a:dispatcher: is crdispatcher#CRDispatcher dict
     if !g:VeryMagicSubstitute || a:dispatcher.cmdtype !=# ':'
 	return
@@ -105,6 +107,7 @@ endfun
 call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSubstitute'))
 
 fun! s:VeryMagicGlobal(dispatcher)
+    " :global and :vglobal commands
     " a:dispatcher: is crdispatcher#CRDispatcher dict
     if !g:VeryMagicGlobal || a:dispatcher.cmdtype !=# ':'
 	return
@@ -127,6 +130,7 @@ endfun
 call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicGlobal'))
 
 fun! s:VeryMagicVimGrep(dispatcher)
+    " :vimgrep and :lvimgrep commands
     " a:dispatcher: is crdispatcher#CRDispatcher dict
     if !g:VeryMagicVimGrep || a:dispatcher.cmdtype !=# ':'
 	return
@@ -148,6 +152,8 @@ endfun
 call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicVimGrep'))
 
 fun! s:VeryMagicSearchArg(dispatcher)
+    " :edit +/pattern but also :view, :sview, :visual, :ex, :split, :vsplit, :new,
+    " :vnew, :find, :sfind.
     if (!g:VeryMagicSearchArg && !g:VeryMagicEscapeBackslashesInSearchArg) || a:dispatcher.cmdtype !=# ':'
 	return
     endif
