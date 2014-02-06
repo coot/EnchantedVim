@@ -22,6 +22,10 @@ if !exists('g:VeryMagicEscapeBackslashesInSearchArg')
     let g:VeryMagicEscapeBackslashesInSearchArg = 0
 endif
 
+let g:DetectVeryMagicPattern = '\v(%(\\\\)*)@>\\v'  " or '^\\v\>'
+let g:DetectVeryMagicBackslashEscapePattern = '\v(%(\\\\\\\\)*)@>\\\\v'  " or '^\\\\v\>'
+" The default matches even number of backslashes followed by v.
+
 fun! s:VeryMagicSearch(dispatcher)
     " / and ? commands
     " a:dispatcher: is crdispatcher#CRDispatcher dict
@@ -29,7 +33,7 @@ fun! s:VeryMagicSearch(dispatcher)
 	return
     endif
     let cmdline = a:dispatcher.cmdline
-    if g:VeryMagic && !empty(cmdline) && cmdline !~# '^\\v'
+    if g:VeryMagic && !empty(cmdline) && cmdline !~# g:DetectVeryMagicPattern
 	let a:dispatcher.cmdline = '\v'.cmdline
     endif
 endfun
@@ -79,7 +83,7 @@ fun! s:VeryMagicSubstitute(dispatcher)
 	    \ '(\2.*)'
     let matches = matchlist(cmdline, pat)
     if !empty(matches)
-	if matches[3] !~# '^\\v' && len(matches[3])
+	if matches[3] !~# g:DetectVeryMagicPattern && len(matches[3])
 	    let cmdline = matches[1].'\v'.matches[3].matches[4]
 	endif
     endif
@@ -102,7 +106,7 @@ fun! s:VeryMagicGlobal(dispatcher)
 	    \ '(.{-})(\2.*)'
     let matches = matchlist(cmdline, pat)
     if !empty(matches)
-	if matches[3] !~# '^\\v' && len(matches[3])
+	if matches[3] !~# g:DetectVeryMagicPattern && len(matches[3])
 	    let cmdline = matches[1].'\v'.matches[3].matches[4]
 	endif
     endif
@@ -124,7 +128,7 @@ fun! s:VeryMagicVimGrep(dispatcher)
 	    \ '(.{-})(\2.*)'
     let matches = matchlist(cmdline, pat)
     if !empty(matches)
-	if matches[3] !~# '^\\v' && len(matches[3])
+	if matches[3] !~# g:DetectVeryMagicPattern && len(matches[3])
 	    let cmdline = matches[1].'\v'.matches[3].matches[4]
 	endif
     endif
@@ -167,7 +171,7 @@ fun! s:VeryMagicSearchArg(dispatcher)
 	    " a single '\'.
 	    let pat = escape(pat, '\')
 	endif
-	if g:VeryMagicSearchArg && pat !~# '^\\\\v'
+	if g:VeryMagicSearchArg && pat !~# g:DetectVeryMagicBackslashEscapedPattern
 	    let pat = '\\v' . pat
 	endif
 	let a:dispatcher.cmdline = matches[1] . matches[2] . matches[3] . pat . matches[5]
