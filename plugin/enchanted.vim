@@ -149,11 +149,11 @@ fun! s:VeryMagicSearchArg(dispatcher)
 			\ 'view?!?|'.
 			\ '\d*\s*sv%[iew]!?'.
 			\ 'vi%[sual]!?|'.
-			\ '\d*\s*vs%[plit]'.
-			\ '\d*\s*new'.
-			\ '\d*\s*vnew?'.
-			\ '\d*\s*sv%[iew]'.
-			\ '\d*\s*sf%[ind]'.
+			\ 'ex!?|'.
+			\ '\d*\s*sp%[lit]!?'.
+			\ '\d*\s*vs%[plit]!?'.
+			\ '\d*\s*new!?'.
+			\ '\d*\s*vnew?!?'.
 			\ '\d*\s*find?!?'.
 			\ '\d*\s*sf%[ind]!?'.
 		    \ ')'.
