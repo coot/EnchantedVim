@@ -165,7 +165,7 @@ fun! s:VeryMagicSearchArg(dispatcher)
     let matches = matchlist(cmdline, pat)
     if !empty(matches)
 	let pat = matches[4]
-	if g:VeryMagicEscapeBackslashesInSearchArg && pat =~# '\v(\\@1<!\\[^\\])'
+	if g:VeryMagicEscapeBackslashesInSearchArg && pat =~# '\v\\@1<!\\%([^\\]|$)'
 	    " TODO: it is not easy find a regex which detects if the pattern
 	    " should be escaped.  The current pattern matches if there is
 	    " a single '\'.
