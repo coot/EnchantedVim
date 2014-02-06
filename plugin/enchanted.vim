@@ -39,6 +39,41 @@ fun! s:VeryMagicSearch(dispatcher)
 endfun
 call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearch'))
 
+fun! <SID>VeryMagicStar(searchforward, g)
+    " used to replace * and # normal commands
+    " This keeps the search history clean (no no very magic patterns which
+    " then would be missunderstood).  Another approach would be to use
+    "	normal *
+    " and only manipulate with the hisory, but this approach is more
+    " consistent.
+    let word = expand('<cword>')
+    let pat = escape(word, '.?=@*+&()[]{}^$|/\~')
+    if a:g
+	let pat = '<'.pat.'>'
+    endif
+    let pat = '\v'.pat
+    if !a:searchforward
+	" emulate vim's behaviour
+	call search(pat, 'bsc')
+	call search(pat, 'b')
+    else
+	call search(pat, 's')
+    endif
+    call histadd('/', pat)
+endfun
+
+if g:VeryMagic
+    " We make this two maps so that the search history contains very magic
+    " patterns.
+    " TODO: they will fail if isk+=': escape('aaa'aaa', ...)
+    nm <silent> * :call <SID>VeryMagicStar(1, 0)<CR>
+    nm <silent> # :call <SID>VeryMagicStar(0, 0)<CR>
+    " This map in general should not be necessary, unless isk contains
+    " characters which needs to be escaped
+    nm <silent> g* :call <SID>VeryMagicStar(1, 1)<CR>
+    nm <silent> g# :call <SID>VeryMagicStar(0, 1)<CR>
+endif
+
 " TODO: /\d\+/-5,/\w\+/+5 will work, but I am not sure why.
 let s:range_pattern = 
 	    \ '\v%('.
