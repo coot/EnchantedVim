@@ -2,26 +2,7 @@
 " Email:  mszamot [AT] gmail [DOT] com
 " License: vim-license, see :help license
 
-" This is a tiny vim script which makes searches with \v persitant.
-" You can turnit off temporarily with 
-"   let g:VeryMagic = 0
-" or if you are already in the command line you can type \m or \M (see :help
-" \m).
-" There is also a very magic substitute
-"   let g:VeryMagicSubstitute = 1 (default is 0)
-" to turn it on you have to add the above line to your vimrc file.
-" More over ther is a very magic global and vglobal:
-"   let g:VeryMagicGlobal = 1 (default is 0)
-" HowItWorks: it simply injects \v at the begining of your pattern after you
-" press enter.
-"
-" Note: if you are using one of the two other of my plugins which are defining
-" maps to <CR> in the command line, you need to update them to the latest
-" version so that they will all work:
-"   system : http://www.vim.org/scripts/script.php?script_id=4224
-"   CommandAlias : http://www.vim.org/scripts/script.php?script_id=4250
-
-" TODO: execute in cmd window, i.e. <c-f>.
+" TODO: very magic version of *
 
 if !exists('g:VeryMagic')
     let g:VeryMagic = 1
