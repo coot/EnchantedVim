@@ -1,5 +1,6 @@
 {
     "name": "EnchantedVim",
+    "author": "Marcin Szamotulski",
     "repository":  {
 	"type": "git",
 	"url": "git@github.com:coot/EnchantedVim.git",
