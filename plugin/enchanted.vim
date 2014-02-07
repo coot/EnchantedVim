@@ -48,7 +48,7 @@ fun! <SID>VeryMagicStar(searchforward, g)
     " consistent.
     let word = expand('<cword>')
     let pat = escape(word, '.?=@*+&()[]{}^$|/\~')
-    if a:g
+    if !a:g
 	let pat = '<'.pat.'>'
     endif
     let pat = '\v'.pat
