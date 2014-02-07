@@ -185,11 +185,11 @@ fun! s:VeryMagicSearchArg(dispatcher)
 			\ '\d*\s*sv%[iew]!?'.
 			\ 'vi%[sual]!?|'.
 			\ 'ex!?|'.
-			\ '\d*\s*sp%[lit]!?'.
-			\ '\d*\s*vs%[plit]!?'.
-			\ '\d*\s*new!?'.
-			\ '\d*\s*vnew?!?'.
-			\ '\d*\s*find?!?'.
+			\ '\d*\s*sp%[lit]!?|'.
+			\ '\d*\s*vs%[plit]!?|'.
+			\ '\d*\s*new!?|'.
+			\ '\d*\s*vnew?!?|'.
+			\ '\d*\s*find?!?|'.
 			\ '\d*\s*sf%[ind]!?'.
 		    \ ')'.
 		\ ')'.
