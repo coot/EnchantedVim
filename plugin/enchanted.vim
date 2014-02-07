@@ -23,7 +23,7 @@ if !exists('g:VeryMagicEscapeBackslashesInSearchArg')
 endif
 
 let g:DetectVeryMagicPattern = '\v(%(\\\\)*)@>\\v'  " or '^\\v\>'
-let g:DetectVeryMagicBackslashEscapePattern = '\v(%(\\\\\\\\)*)@>\\\\v'  " or '^\\\\v\>'
+let g:DetectVeryMagicBackslashEscapedPattern = '\v(%(\\\\\\\\)*)@>\\\\v'  " or '^\\\\v\>'
 " The default matches even number of backslashes followed by v.
 
 fun! s:VeryMagicSearch(dispatcher)
