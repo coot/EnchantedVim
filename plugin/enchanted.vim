@@ -37,7 +37,14 @@ fun! s:VeryMagicSearch(dispatcher)
 	let a:dispatcher.cmdline = '\v'.cmdline
     endif
 endfun
-call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearch'))
+try
+    call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearch'))
+catch /E121:/
+    echohl ErrorMsg
+    echom 'EnchantedVim Plugin: please install "https://github.com/coot/CRDispatcher".'
+    echohl Normal
+    finish
+endtry
 
 fun! <SID>VeryMagicStar(searchforward, g)
     " used to replace * and # normal commands
@@ -124,7 +131,10 @@ fun! s:VeryMagicSubstitute(dispatcher)
     endif
     let a:dispatcher.cmdline = cmdline
 endfun
-call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSubstitute'))
+try
+    call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSubstitute'))
+catch /E121:/
+endtry
 
 fun! s:VeryMagicGlobal(dispatcher)
     " :global and :vglobal commands
@@ -147,7 +157,10 @@ fun! s:VeryMagicGlobal(dispatcher)
     endif
     let a:dispatcher.cmdline = cmdline
 endfun
-call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicGlobal'))
+try
+    call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicGlobal'))
+catch /E121:/
+endtry
 
 fun! s:VeryMagicVimGrep(dispatcher)
     " :vimgrep and :lvimgrep commands
@@ -169,7 +182,10 @@ fun! s:VeryMagicVimGrep(dispatcher)
     endif
     let a:dispatcher.cmdline = cmdline
 endfun
-call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicVimGrep'))
+try
+    call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicVimGrep'))
+catch /E121:/
+endtry
 
 fun! s:VeryMagicSearchArg(dispatcher)
     " :edit +/pattern but also :view, :sview, :visual, :ex, :split, :vsplit, :new,
@@ -212,4 +228,7 @@ fun! s:VeryMagicSearchArg(dispatcher)
 	let a:dispatcher.cmdline = matches[1] . matches[2] . matches[3] . pat . matches[5]
     endif
 endfun
-call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearchArg'))
+try
+    call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearchArg'))
+catch /E121:/
+endtry
