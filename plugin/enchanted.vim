@@ -13,8 +13,11 @@ endif
 if !exists('g:VeryMagicGlobal')
     let g:VeryMagicGlobal = 0
 endif
-if !exists('g:VeryMagicArg')
-    let g:VeryMagicArg = 0
+if !exists('g:VeryMagicVimGrep')
+    let g:VeryMagicVimGrep = 0
+endif
+if !exists('g:VeryMagicSearchArg')
+    let g:VeryMagicSearchArg = 0
 endif
 if !exists('g:VeryMagicEscapeBackslashesInSearchArg')
     " This is very experimental. It has to detect when to escape the pattern
