@@ -2,8 +2,6 @@
 " Email:  mszamot [AT] gmail [DOT] com
 " License: vim-license, see :help license
 
-" TODO: very magic version of *
-
 if !exists('g:VeryMagic')
     let g:VeryMagic = 1
 endif
