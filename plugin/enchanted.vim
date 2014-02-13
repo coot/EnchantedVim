@@ -40,7 +40,7 @@ fun! s:VeryMagicSearch(dispatcher)  "{{{
     let cmd = a:dispatcher.cmd
     let cmdline = cmd.pattern
     let a:dispatcher.state = 1
-    if !empty(cmdline) && cmdline !~# g:DetectVeryMagicPattern
+    if !empty(cmdline) && cmdline[0] !=# '/' && cmdline !~# g:DetectVeryMagicPattern
 	let cmdline = '\v'.cmdline
     endif
     let cmd.pattern = cmdline
@@ -112,7 +112,6 @@ endfun  "}}}
 if g:VeryMagic
     " We make this two maps so that the search history contains very magic
     " patterns.
-    " TODO: they will fail if isk+=': escape('aaa'aaa', ...)
     nm <silent> * :call <SID>VeryMagicStar(1, 0)<CR>
     nm <silent> # :call <SID>VeryMagicStar(0, 0)<CR>
     " This map in general should not be necessary, unless isk contains
@@ -232,6 +231,6 @@ fun! s:VeryMagicSearchArg(dispatcher)  "{{{
     endif
 endfun  "}}}
 try
-    call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearchArg'))
+    " call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearchArg'))
 catch /E121:/
 endtry
