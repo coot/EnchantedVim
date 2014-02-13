@@ -159,6 +159,7 @@ fun! s:VeryMagicSearchArg(dispatcher)  "{{{
     " :edit +/pattern but also :view, :sview, :visual, :ex, :split, :vsplit, :new,
     " :vnew, :find, :sfind.
     if (!g:VeryMagicSearchArg && !g:VeryMagicEscapeBackslashesInSearchArg) || a:dispatcher.cmdtype !=# ':'
+	let a:dispatcher.state = 2
 	return
     endif
     let cmdline = a:dispatcher.cmdline
@@ -183,6 +184,7 @@ fun! s:VeryMagicSearchArg(dispatcher)  "{{{
 		\ '(.*)'
     let matches = matchlist(cmdline, pat)
     if !empty(matches)
+	let a:dispatcher.state = 1
 	let pat = matches[4]
 	if g:VeryMagicEscapeBackslashesInSearchArg && pat =~# '\v\\@1<!\\%([^\\]|$)'
 	    " TODO: it is not easy find a regex which detects if the pattern
@@ -195,7 +197,7 @@ fun! s:VeryMagicSearchArg(dispatcher)  "{{{
 	endif
 	let a:dispatcher.cmdline = matches[1] . matches[2] . matches[3] . pat . matches[5]
     endif
-endfun
+endfun  "}}}
 try
     call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearchArg'))
 catch /E121:/
