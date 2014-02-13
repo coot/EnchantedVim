@@ -14,6 +14,9 @@ endif
 if !exists('g:VeryMagicVimGrep')
     let g:VeryMagicVimGrep = 0
 endif
+if !exists('g:VeryMagicRange')
+    let g:VeryMagicRange = 0
+endif
 if !exists('g:VeryMagicSearchArg')
     let g:VeryMagicSearchArg = 0
 endif
@@ -119,6 +122,37 @@ if g:VeryMagic
     nm <silent> g# :call <SID>VeryMagicStar(0, 1)<CR>
 endif
 
+let s:Range = copy(crdispatcher#CallbackClass)
+fun! s:Range.__transform_cmd__(dispatcher) dict  "{{{
+    if !g:VeryMagicRange || a:dispatcher.cmdtype !=# ':'
+	return
+    endif
+    let a:dispatcher.state = 1
+    let range = a:dispatcher.cmd.range
+    let idx = 0
+    let new_range = ''
+    while idx < len(range)
+	let char = range[idx]
+	let rest = range[(idx):]
+	if char ==# '/' || char ==# '?'
+	    let [char, pattern] = vimlparsers#ParsePattern(rest)
+	    let g:VeryMagicLastSearchCmd = pattern
+	    let idx += len(pattern) + 1  " + 1 is added at the end
+	    if pattern !~# g:DetectVeryMagicPattern
+		let pattern = '\v' . pattern
+	    endif
+	    let new_range .= char . pattern . char
+	else
+	    let new_range .= char
+	endif
+	let idx += 1
+    endwhile
+    let a:dispatcher.cmd.range = new_range
+endfun  "}}}
+try
+    call add(crdispatcher#CRDispatcher['callbacks'], s:Range)
+catch /E121:/
+endtry
 
 let s:Substitute = copy(crdispatcher#CallbackClass)
 call s:Substitute.__init__(
