@@ -83,7 +83,6 @@ catch /E121:/
     echohl ErrorMsg
     echom 'EnchantedVim Plugin: please install "https://github.com/coot/CRDispatcher".'
     echohl Normal
-    finish
 endtry
 
 fun! <SID>VeryMagicStar(searchforward, g)  "{{{
