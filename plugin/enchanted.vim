@@ -119,113 +119,43 @@ if g:VeryMagic
     nm <silent> g# :call <SID>VeryMagicStar(0, 1)<CR>
 endif
 
-" TODO: /\d\+/-5,/\w\+/+5 will work, but I am not sure why.
-let s:range_pattern = 
-	    \ '\v%('.
-		\ '%('.
-		    \ '\%|'.
-		    \ '\$|'.
-		    \ '\.|'.
-		    \ '\\\&|'.
-		    \ '\d+|'.
-		    \ "['`]".'[a-zA-Z<>\[\]'."'`".']|'.
-		    \ '/.{-}/|'.
-		    \ '\?.{-}\?'.
-		\ ')'.
-		\ '\s*%([\+-]\s*\d*)?'.
-	    \ ')\s*' .
-	    \ '%([,;]\s*'.
-		\ '%('.
-		    \ '\.|'.
-		    \ '\$|'.
-		    \ "['`]".'[a-zA-Z<>\[\]'."'`".']|'.
-		    \ '\\\&|'.
-		    \ '\d+|'.
-		    \ '/.{-}/|'.
-		    \ '\?.{-}\?'.
-		\ ')\s*'.
-		\ '\s*%([\+-]\s*\d*)?'.
-	    \ ')?'
 
-fun! s:VeryMagicSubstitute(dispatcher)
-    " :substitute command
-    " a:dispatcher: is crdispatcher#CRDispatcher dict
-    if !g:VeryMagicSubstitute || a:dispatcher.cmdtype !=# ':'
-	return
-    endif
-    let cmdline = a:dispatcher.cmdline
-    let pat = '^\v([[:space:]:]*'.
-		    \ '%('.s:range_pattern.')?\s*'.
-		    \ 's%[ubstitute]\s*'.
-		    \ '([^a-zA-Z_1-9])'.
-	    \ ')'.
-	    \ '(.{-})'.
-	    \ '(\2.*)'
-    let matches = matchlist(cmdline, pat)
-    if !empty(matches)
-	if matches[3] !~# g:DetectVeryMagicPattern && len(matches[3])
-	    let cmdline = matches[1].'\v'.matches[3].matches[4]
-	endif
-    endif
-    let a:dispatcher.cmdline = cmdline
-endfun
+let s:Substitute = copy(crdispatcher#CallbackClass)
+call s:Substitute.__init__(
+	    \ 'g:VeryMagicSubstitute',
+	    \ ':',
+	    \ '^\C\v\s*s%[ubstitute]\s*$',
+	    \ 2)
 try
-    call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSubstitute'))
+    call add(crdispatcher#CRDispatcher['callbacks'], s:Substitute)
 catch /E121:/
 endtry
 
-fun! s:VeryMagicGlobal(dispatcher)
-    " :global and :vglobal commands
-    " a:dispatcher: is crdispatcher#CRDispatcher dict
-    if !g:VeryMagicGlobal || a:dispatcher.cmdtype !=# ':'
-	return
-    endif
-    let cmdline = a:dispatcher.cmdline
-    let pat = '^\v([[:space:]:]*'.
-		    \ '%('.s:range_pattern.')?\s*'.
-		    \ '%(g%[lobal]|v%[global])!?'.
-		    \ '\s*([^a-zA-Z_1-9])'.
-	    \ ')'.
-	    \ '(.{-})(\2.*)'
-    let matches = matchlist(cmdline, pat)
-    if !empty(matches)
-	if matches[3] !~# g:DetectVeryMagicPattern && len(matches[3])
-	    let cmdline = matches[1].'\v'.matches[3].matches[4]
-	endif
-    endif
-    let a:dispatcher.cmdline = cmdline
-endfun
+let s:VimGrep = copy(crdispatcher#CallbackClass)
+call s:VimGrep.__init__('g:VeryMagicVimGrep',
+	    \ ':',
+	    \ '^\C\v(\s*%(vim%[grep]|lv%[imgrep])\s*)$')
 try
-    call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicGlobal'))
+    call add(crdispatcher#CRDispatcher['callbacks'], s:VimGrep)
 catch /E121:/
 endtry
 
-fun! s:VeryMagicVimGrep(dispatcher)
-    " :vimgrep and :lvimgrep commands
-    " a:dispatcher: is crdispatcher#CRDispatcher dict
-    if !g:VeryMagicVimGrep || a:dispatcher.cmdtype !=# ':'
-	return
-    endif
-    let cmdline = a:dispatcher.cmdline
-    let pat = '\v^([[:space:]:]*'.
-		    \ '%(vim%[grep]|lv%[imgrep])!?'.
-		    \ '\s*([^a-zA-Z_1-9])'.
-	    \ ')'.
-	    \ '(.{-})(\2.*)'
-    let matches = matchlist(cmdline, pat)
-    if !empty(matches)
-	if matches[3] !~# g:DetectVeryMagicPattern && len(matches[3])
-	    let cmdline = matches[1].'\v'.matches[3].matches[4]
-	endif
-    endif
-    let a:dispatcher.cmdline = cmdline
+let s:Global = copy(crdispatcher#CallbackClass)
+call s:Global.__init__(
+	    \ 'g:VeryMagicGlobal',
+	    \ ':',
+	    \ '^\v(%(\s*g%[lobal]|v%[global])!?\s*)$')
+fun! s:Global.__transform_args__(dispatcher, cmd_args)
+    let disp = copy(a:dispatcher)
+    let disp.state = 0
+    return disp.dispatch(a:dispatcher.ctrl_f, a:cmd_args, a:dispatcher.cmdtype)
 endfun
 try
-    call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicVimGrep'))
+    call add(crdispatcher#CRDispatcher['callbacks'], s:Global)
 catch /E121:/
 endtry
 
-fun! s:VeryMagicSearchArg(dispatcher)
+fun! s:VeryMagicSearchArg(dispatcher)  "{{{
     " :edit +/pattern but also :view, :sview, :visual, :ex, :split, :vsplit, :new,
     " :vnew, :find, :sfind.
     if (!g:VeryMagicSearchArg && !g:VeryMagicEscapeBackslashesInSearchArg) || a:dispatcher.cmdtype !=# ':'
