@@ -27,17 +27,53 @@ let g:DetectVeryMagicPattern = '\v(%(\\\\)*)@>\\v'  " or '^\\v\>'
 let g:DetectVeryMagicBackslashEscapedPattern = '\v(%(\\\\\\\\)*)@>\\\\v'  " or '^\\\\v\>'
 " The default matches even number of backslashes followed by v.
 
-fun! s:VeryMagicSearch(dispatcher)
+fun! s:VeryMagicSearch(dispatcher)  "{{{
     " / and ? commands
     " a:dispatcher: is crdispatcher#CRDispatcher dict
-    if !(a:dispatcher.cmdtype ==# '/' || a:dispatcher.cmdtype ==# '?')
+    if !g:VeryMagic || !(a:dispatcher.cmdtype ==# '/' || a:dispatcher.cmdtype ==# '?')
+	let a:dispatcher.state = 1
 	return
     endif
-    let cmdline = a:dispatcher.cmdline
-    if g:VeryMagic && !empty(cmdline) && cmdline !~# g:DetectVeryMagicPattern
-	let a:dispatcher.cmdline = '\v'.cmdline
+    let cmd = a:dispatcher.cmd
+    let cmdline = cmd.pattern
+    let a:dispatcher.state = 1
+    if !empty(cmdline) && cmdline !~# g:DetectVeryMagicPattern
+	let cmdline = '\v'.cmdline
     endif
-endfun
+    let cmd.pattern = cmdline
+    let [char, pattern] = vimlparsers#ParsePattern((a:dispatcher.cmdtype) . cmdline)
+    let offset = cmdline[(len(pattern)+1):]
+    " There can be more than one offset
+    if offset =~ '\s*;\s*[?/]'
+	let cmdline = cmdline[:len(pattern)]  " cut the offset
+	let new_offset = ''
+	let o_pat = '^\s*\v(\d+|[+-]\d*|[esb][+-]?\d*)'
+	while !empty(offset)
+	    let o = matchstr(offset, o_pat)
+	    if !empty(o)
+		let new_offset .= o
+		let offset = offset[len(o):]
+	    elseif offset =~ '\s*;\s*[?/]'
+		let start = matchstr(offset, '\v\s*;\s*[?/]@=')  " ? or /
+		let offset = offset[len(start):]
+		let [char, pat] = vimlparsers#ParsePattern(offset)
+		let pat_l = len(pat)
+		let offset = offset[(pat_l+1):]
+		let end = matchstr(offset, '[?/]\s*')  " empty string, ? or /
+		let offset = offset[len(end):]
+		if pat_l && pat !~# g:DetectVeryMagicPattern
+		    let pat = '\v'.pat
+		endif
+		let new_offset .= start . char . pat . end
+	    else
+		let new_offset .= offset
+		break
+	    endif
+	endwhile
+	let cmd.pattern = cmdline.new_offset
+    endif
+    let g:VeryMagicLastSearchCmd = cmd.pattern
+endfun  "}}}
 try
     call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearch'))
 catch /E121:/
