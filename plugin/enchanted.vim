@@ -83,7 +83,7 @@ catch /E121:/
     finish
 endtry
 
-fun! <SID>VeryMagicStar(searchforward, g)
+fun! <SID>VeryMagicStar(searchforward, g)  "{{{
     " used to replace * and # normal commands
     " This keeps the search history clean (no no very magic patterns which
     " then would be missunderstood).  Another approach would be to use
@@ -103,8 +103,9 @@ fun! <SID>VeryMagicStar(searchforward, g)
     else
 	call search(pat, 's')
     endif
+    let g:VeryMagicLastSearchCmd = pat
     call histadd('/', pat)
-endfun
+endfun  "}}}
 
 if g:VeryMagic
     " We make this two maps so that the search history contains very magic
