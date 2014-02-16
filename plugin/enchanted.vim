@@ -194,7 +194,8 @@ fun! s:VeryMagicSearchArg(dispatcher)  "{{{
 	let a:dispatcher.state = 2
 	return
     endif
-    let cmdline = a:dispatcher.cmdline
+    let cmd = a:dispatcher.cmd
+    let cmdline = cmd.cmd
     let pat = '^\v([[:space:]:]*'.
 		    \ '%('.
 			\ 'e%[dit]!?|'.
@@ -227,10 +228,10 @@ fun! s:VeryMagicSearchArg(dispatcher)  "{{{
 	if g:VeryMagicSearchArg && pat !~# g:DetectVeryMagicBackslashEscapedPattern
 	    let pat = '\\v' . pat
 	endif
-	let a:dispatcher.cmdline = matches[1] . matches[2] . matches[3] . pat . matches[5]
+	let cmd.cmd = matches[1] . matches[2] . matches[3] . pat . matches[5]
     endif
 endfun  "}}}
 try
-    " call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearchArg'))
+    call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearchArg'))
 catch /E121:/
 endtry
