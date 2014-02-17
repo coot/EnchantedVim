@@ -20,6 +20,9 @@ endif
 if !exists('g:VeryMagicSearchArg')
     let g:VeryMagicSearchArg = 0
 endif
+if !exists('g:VeryMagicFunction')
+    let g:VeryMagicFunction = 0
+endif
 if !exists('g:VeryMagicEscapeBackslashesInSearchArg')
     " This is very experimental. It has to detect when to escape the pattern
     " to not double escape it.
@@ -169,6 +172,15 @@ call s:VimGrep.__init__('g:VeryMagicVimGrep',
 	    \ '^\C\v(\s*%(vim%[grep]|lv%[imgrep])\s*)$')
 try
     call add(crdispatcher#CRDispatcher['callbacks'], s:VimGrep)
+catch /E121:/
+endtry
+
+let s:Function = copy(crdispatcher#CallbackClass)
+call s:Function.__init__('g:VeryMagicFunction',
+	    \ ':',
+	    \ '^\C\v\s*fu%[nction]\s*$')
+try
+    call add(crdispatcher#CRDispatcher['callbacks'], s:Function)
 catch /E121:/
 endtry
 
