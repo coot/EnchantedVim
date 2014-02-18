@@ -23,6 +23,9 @@ endif
 if !exists('g:VeryMagicFunction')
     let g:VeryMagicFunction = 0
 endif
+if !exists('g:VeryMagicHelpgrep')
+    let g:VeryMagicHelpgrep = 0
+endif
 if !exists('g:VeryMagicEscapeBackslashesInSearchArg')
     " This is very experimental. It has to detect when to escape the pattern
     " to not double escape it.
@@ -245,5 +248,27 @@ fun! s:VeryMagicSearchArg(dispatcher)  "{{{
 endfun  "}}}
 try
     call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearchArg'))
+catch /E121:/
+endtry
+
+fun! s:VeryMagicHelpgrep(dispatcher)
+    if (!g:VeryMagicHelpgrep) || a:dispatcher.cmdtype !=# ':'
+	let a:dispatcher.state = 2
+	return
+    endif
+    let cmd = a:dispatcher.cmd
+    let cm = cmd.cmd
+    let matches = matchlist(cm, '^\C\v(%(helpg%[rep]|lh%[elpgrep])\s*)(\S.*)') 
+    if !empty(matches)
+	let l:c = matches[1]
+	let l:p = matches[2]
+	if l:p !~# g:DetectVeryMagicPattern
+	    let cm = l:c.'\v'.l:p
+	endif
+    endif
+    let cmd.cmd = l:cm
+endfun
+try
+    call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicHelpgrep'))
 catch /E121:/
 endtry
