@@ -112,6 +112,7 @@ fun! <SID>VeryMagicStar(searchforward, g)  "{{{
 	call search(pat, 's')
     endif
     let g:VeryMagicLastSearchCmd = pat
+    let @/ = pat
     call histadd('/', pat)
 endfun  "}}}
 
