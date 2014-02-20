@@ -82,14 +82,14 @@ fun! s:VeryMagicSearch(dispatcher)  "{{{
 	let cmd.pattern = cmdline.new_offset
     endif
     let g:VeryMagicLastSearchCmd = cmd.pattern
-endfun  "}}}
+endfun
 try
     call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearch'))
 catch /E121:/
     echohl ErrorMsg
     echom 'EnchantedVim Plugin: please install "https://github.com/coot/CRDispatcher".'
     echohl Normal
-endtry
+endtry  "}}}
 
 fun! <SID>VeryMagicStar(searchforward, g)  "{{{
     " used to replace * and # normal commands
@@ -114,7 +114,7 @@ fun! <SID>VeryMagicStar(searchforward, g)  "{{{
     let g:VeryMagicLastSearchCmd = pat
     let @/ = pat
     call histadd('/', pat)
-endfun  "}}}
+endfun
 
 if g:VeryMagic
     " We make this two maps so that the search history contains very magic
@@ -125,10 +125,10 @@ if g:VeryMagic
     " characters which needs to be escaped
     nm <silent> g* :call <SID>VeryMagicStar(1, 1)<CR>
     nm <silent> g# :call <SID>VeryMagicStar(0, 1)<CR>
-endif
+endif  "}}}
 
-let s:Range = copy(crdispatcher#CallbackClass)
-fun! s:Range.__transform_cmd__(dispatcher) dict  "{{{
+let s:Range = copy(crdispatcher#CallbackClass)  "{{{
+fun! s:Range.__transform_cmd__(dispatcher) dict  "{{{2
     if !g:VeryMagicRange || a:dispatcher.cmdtype !=# ':'
 	return
     endif
@@ -153,13 +153,13 @@ fun! s:Range.__transform_cmd__(dispatcher) dict  "{{{
 	let idx += 1
     endwhile
     let a:dispatcher.cmd.range = new_range
-endfun  "}}}
+endfun  "}}}2
 try
     call add(crdispatcher#CRDispatcher['callbacks'], s:Range)
 catch /E121:/
-endtry
+endtry  "}}}
 
-let s:Substitute = copy(crdispatcher#CallbackClass)
+let s:Substitute = copy(crdispatcher#CallbackClass)  "{{{
 call s:Substitute.__init__(
 	    \ 'g:VeryMagicSubstitute',
 	    \ ':',
@@ -168,27 +168,27 @@ call s:Substitute.__init__(
 try
     call add(crdispatcher#CRDispatcher['callbacks'], s:Substitute)
 catch /E121:/
-endtry
+endtry  "}}}
 
-let s:VimGrep = copy(crdispatcher#CallbackClass)
+let s:VimGrep = copy(crdispatcher#CallbackClass)  "{{{
 call s:VimGrep.__init__('g:VeryMagicVimGrep',
 	    \ ':',
 	    \ '^\C\v(\s*%(vim%[grep]|lv%[imgrep])\s*)$')
 try
     call add(crdispatcher#CRDispatcher['callbacks'], s:VimGrep)
 catch /E121:/
-endtry
+endtry  "}}}
 
-let s:Function = copy(crdispatcher#CallbackClass)
+let s:Function = copy(crdispatcher#CallbackClass)  "{{{
 call s:Function.__init__('g:VeryMagicFunction',
 	    \ ':',
 	    \ '^\C\v\s*fu%[nction]\s*$')
 try
     call add(crdispatcher#CRDispatcher['callbacks'], s:Function)
 catch /E121:/
-endtry
+endtry  "}}}
 
-let s:Global = copy(crdispatcher#CallbackClass)
+let s:Global = copy(crdispatcher#CallbackClass)  "{{{
 call s:Global.__init__(
 	    \ 'g:VeryMagicGlobal',
 	    \ ':',
@@ -201,7 +201,7 @@ endfun
 try
     call add(crdispatcher#CRDispatcher['callbacks'], s:Global)
 catch /E121:/
-endtry
+endtry  "}}}
 
 fun! s:VeryMagicSearchArg(dispatcher)  "{{{
     " :edit +/pattern but also :view, :sview, :visual, :ex, :split, :vsplit, :new,
@@ -246,13 +246,13 @@ fun! s:VeryMagicSearchArg(dispatcher)  "{{{
 	endif
 	let cmd.cmd = matches[1] . matches[2] . matches[3] . pat . matches[5]
     endif
-endfun  "}}}
+endfun
 try
     call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSearchArg'))
 catch /E121:/
-endtry
+endtry  "}}}
 
-fun! s:VeryMagicHelpgrep(dispatcher)
+fun! s:VeryMagicHelpgrep(dispatcher)  "{{{
     if (!g:VeryMagicHelpgrep) || a:dispatcher.cmdtype !=# ':'
 	let a:dispatcher.state = 2
 	return
@@ -272,4 +272,4 @@ endfun
 try
     call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicHelpgrep'))
 catch /E121:/
-endtry
+endtry  "}}}
