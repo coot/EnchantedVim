@@ -12,8 +12,11 @@ or if you are already in the command line you can type `\m` or `\M` (see :help
   let g:VeryMagicSubstitute = 1  " (default is 0)
   let g:VeryMagicGlobal = 1  " (default is 0)
   let g:VeryMagicVimGrep = 1  " (default is 0)
-  let g:VeryMagicSearchArg = 1  " (default is 0)
-  let g:VeryMagicEscapeBackslashesInSearchArg = 1  " (default is 0)
+  let g:VeryMagicSearchArg = 1  " (default is 0, :edit +/{pattern}))
+  let g:VeryMagicFunction = 1  " (default is 0, :fun /{pattern})
+  let g:VeryMagicHelpgrep = 1  " (default is 0)
+  let g:VeryMagicRange = 1  " (default is 0, search patterns in command ranges)
+  let g:VeryMagicEscapeBackslashesInSearchArg = 1  " (default is 0, :edit +/{pattern}))
 ```
 
 The `g:VeryMagicSearchArg` turns on the support for very magic `:edit +/pat
@@ -39,4 +42,3 @@ version so that they will all work:
 # Requirements
 You have to also install
 [CRDispatcher](https://www.github/coot/CRDispatcher) plugin.
-
