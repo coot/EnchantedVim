@@ -31,6 +31,9 @@ if !exists('g:VeryMagicEscapeBackslashesInSearchArg')
     " to not double escape it.
     let g:VeryMagicEscapeBackslashesInSearchArg = 0
 endif
+if !exists('g:SortEditArgs')
+    let g:SortEditArgs = 0
+endif
 
 let g:DetectVeryMagicPattern = '\v(%(\\\\)*)@>\\v'  " or '^\\v\>'
 let g:DetectVeryMagicBackslashEscapedPattern = '\v(%(\\\\\\\\)*)@>\\\\v'  " or '^\\\\v\>'
@@ -200,6 +203,48 @@ fun! s:Global.__transform_args__(dispatcher, cmd_args)
 endfun
 try
     call add(crdispatcher#CRDispatcher['callbacks'], s:Global)
+catch /E121:/
+endtry  "}}}
+
+fun! s:SortEditArgs(dispatcher)  "{{{
+    " Rewrite ":edit fname.txt +/pattern" into ":edit +/pattern fname.txt"
+    " this works for all g:vimlparsers#edit_cmd_pat
+    let cmd = a:dispatcher.cmd
+    let c = cmd.cmd
+    let match = matchstr(c, g:vimlparsers#edit_cmd_pat)
+    if (!g:SortEditArgs) || a:dispatcher.cmdtype !=# ':' || empty(match)
+	let a:dispatcher.state = 1
+	return
+    endif
+    let c = c[len(match):]
+    let _c = {
+	\ 'cmd': match,
+	\ 'fname': '',
+	\ }
+    while c !~ '^\s*$'
+	let match = matchstr(c, '\v^\s*\+\/%(\S|%(%(%(\\\\)*)@>\\)@10<=\s)*')
+	if !empty(match)
+	    let c = c[len(match):]
+	    let _c.cmd .= match
+	    cont
+	endif
+	let match = matchstr(c, '\v^\s*\++%(\S|%(%(%(\\\\)*)@>\\)@10<=\s)*')
+	if !empty(match)
+	    let c = c[len(match):]
+	    let _c.cmd .= match
+	    cont
+	endif
+	let match = matchstr(c, '\v^\s*[^+](\S|%(%(%(\\\\)*)@>\\)@10<=\s)*')
+	if !empty(match)
+	    let c = c[len(match):]
+	    let _c.fname .= match
+	    cont
+	endif
+    endwhile
+    let cmd.cmd = _c.cmd . _c.fname
+endfun
+try
+    call add(crdispatcher#CRDispatcher['callbacks'], function('s:SortEditArgs'))
 catch /E121:/
 endtry  "}}}
 
