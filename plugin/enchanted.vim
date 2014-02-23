@@ -257,22 +257,7 @@ fun! s:VeryMagicSearchArg(dispatcher)  "{{{
     endif
     let cmd = a:dispatcher.cmd
     let cmdline = cmd.cmd
-    let pat = '^\v([[:space:]:]*'.
-		    \ '%('.
-			\ 'e%[dit]!?|'.
-			\ 'r%[ead]|'.
-			\ 'view?!?|'.
-			\ '\d*\s*sv%[iew]!?'.
-			\ 'vi%[sual]!?|'.
-			\ 'ex!?|'.
-			\ '\d*\s*sp%[lit]!?|'.
-			\ '\d*\s*vs%[plit]!?|'.
-			\ '\d*\s*new!?|'.
-			\ '\d*\s*vnew?!?|'.
-			\ '\d*\s*find?!?|'.
-			\ '\d*\s*sf%[ind]!?'.
-		    \ ')'.
-		\ ')'.
+    let pat = g:vimlparsers#edit_cmd_pat . 
 		\ '(\s.{-})'.
 		\ '(\s@1<=\+/\S@=)'.
 		\ '(%(\S|%(%(%(%(\\\\)*)@>)\\)@10<=\s)+)'.
