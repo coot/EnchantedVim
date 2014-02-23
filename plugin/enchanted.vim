@@ -260,6 +260,7 @@ fun! s:VeryMagicSearchArg(dispatcher)  "{{{
     let pat = '^\v([[:space:]:]*'.
 		    \ '%('.
 			\ 'e%[dit]!?|'.
+			\ 'r%[ead]|'.
 			\ 'view?!?|'.
 			\ '\d*\s*sv%[iew]!?'.
 			\ 'vi%[sual]!?|'.
@@ -274,7 +275,7 @@ fun! s:VeryMagicSearchArg(dispatcher)  "{{{
 		\ ')'.
 		\ '(\s.{-})'.
 		\ '(\s@1<=\+/\S@=)'.
-		\ '(%(\S|\\\s)+)'.
+		\ '(%(\S|%(%(%(%(\\\\)*)@>)\\)@10<=\s)+)'.
 		\ '(.*)'
     let matches = matchlist(cmdline, pat)
     if !empty(matches)
@@ -283,7 +284,8 @@ fun! s:VeryMagicSearchArg(dispatcher)  "{{{
 	if g:VeryMagicEscapeBackslashesInSearchArg && pat =~# '\v\\@1<!\\%([^\\]|$)'
 	    " TODO: it is not easy find a regex which detects if the pattern
 	    " should be escaped.  The current pattern matches if there is
-	    " a single '\'.
+	    " a single '\' and this will not work well when the user wants to
+	    " escape multiple bacsklashes.
 	    let pat = escape(pat, '\')
 	endif
 	if g:VeryMagicSearchArg && pat !~# g:DetectVeryMagicBackslashEscapedPattern
