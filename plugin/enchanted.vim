@@ -35,8 +35,8 @@ if !exists('g:SortEditArgs')
     let g:SortEditArgs = 0
 endif
 
-let g:DetectVeryMagicPattern = '\v(%(\\\\)*)@>\\v'  " or '^\\v\>'
-let g:DetectVeryMagicBackslashEscapedPattern = '\v(%(\\\\\\\\)*)@>\\\\v'  " or '^\\\\v\>'
+let g:DetectVeryMagicPattern = '\v%(%(\\\\)*)@>\\v'  " or '^\\v\>'
+let g:DetectVeryMagicBackslashEscapedPattern = '\v%(%(\\\\\\\\)*)@>\\\\v'  " or '^\\\\v\>'
 " The default matches even number of backslashes followed by v.
 
 fun! s:VeryMagicSearch(dispatcher)  "{{{
