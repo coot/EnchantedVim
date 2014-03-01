@@ -17,6 +17,7 @@ or if you are already in the command line you can type `\m` or `\M` (see :help
   let g:VeryMagicHelpgrep = 1  " (default is 0)
   let g:VeryMagicRange = 1  " (default is 0, search patterns in command ranges)
   let g:VeryMagicEscapeBackslashesInSearchArg = 1  " (default is 0, :edit +/{pattern}))
+  let g:SortEditArgs = 1  " (default is 0, see below)
 ```
 
 The `g:VeryMagicSearchArg` turns on the support for very magic `:edit +/pat
@@ -28,6 +29,10 @@ I forget about this) if there is at least one unescaped backslash (this
 prevents from double escaping when resuing the command from command history).
 You still need to escape backslashes when you run `vim +/\\vpat` from the
 command line, e.g. `vim +"/\\vpattern" file.vim`.
+
+If you set `g:SortEditArgs = 1` the arguments for `:edit` like commands will
+be reordered.  This allows to use `:edit file.txt +/pattern` which will be
+reordered into `:edit +/pattern file.txt`.
 
 ## How it works
 It simply injects `\v` at the beginning of your pattern *after you press enter*
