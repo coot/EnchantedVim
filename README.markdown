@@ -34,6 +34,15 @@ If you set `g:SortEditArgs = 1` the arguments for `:edit` like commands will
 be reordered.  This allows to use `:edit file.txt +/pattern` which will be
 reordered into `:edit +/pattern file.txt`.
 
+If you use `incsearch` setting, you probably want to use `g:VeryMagic = 0` and
+set two mappings:
+```viml
+nm / /\v
+nm ? ?\v
+```
+otherwise `incsearch` will not work for patterns which contains non
+alphanumeric characters.
+
 ## How it works
 It simply injects `\v` at the beginning of your pattern *after you press enter*
 or after c&#95;CTRL-f.
