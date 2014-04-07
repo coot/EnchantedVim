@@ -53,6 +53,11 @@ version so that they will all work:
 * [System](https://github.com/coot/System)
 * [CommandAlias](https://github.com/coot/cmdalias_vim)
 
+## Macros
+
+The plugin works well with vim macros which involve a search command like `/`.
+Used register will not contain `\v` but it will by added when you play it.
+
 # Requirements
 You have to also install
 [CRDispatcher](https://www.github/coot/CRDispatcher) plugin.
