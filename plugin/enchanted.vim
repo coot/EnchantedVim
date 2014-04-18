@@ -8,6 +8,9 @@ endif
 if !exists('g:VeryMagicSubstitute')
     let g:VeryMagicSubstitute = 0
 endif
+if !exists('g:VeryMagicSubstituteNormalise')
+    let g:VeryMagicSubstituteNormalise = 0
+endif
 if !exists('g:VeryMagicGlobal')
     let g:VeryMagicGlobal = 0
 endif
@@ -303,5 +306,18 @@ fun! s:VeryMagicHelpgrep(dispatcher)  "{{{
 endfun
 try
     call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicHelpgrep'))
+catch /E121:/
+endtry  "}}}
+
+fun! s:VeryMagicSubstituteNormalise(dispatcher) "{{{
+    if (!g:VeryMagicSubstituteNormalise) || a:dispatcher.cmdtype !=# ':'
+	let a:dispatcher.state = 1
+	return
+    endif
+    let cmd = a:dispatcher.cmd
+    let cmd.args = substitute(cmd.args, '\\n', '\\r', 'g')
+endfun
+try
+    call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSubstituteNormalise'))
 catch /E121:/
 endtry  "}}}
