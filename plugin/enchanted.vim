@@ -29,6 +29,9 @@ endif
 if !exists('g:VeryMagicHelpgrep')
     let g:VeryMagicHelpgrep = 0
 endif
+if !exists('g:SmartCaseVimGrep')
+    let g:SmartCaseVimGrep = 0
+endif
 if !exists('g:VeryMagicEscapeBackslashesInSearchArg')
     " This is very experimental. It has to detect when to escape the pattern
     " to not double escape it.
@@ -39,6 +42,7 @@ if !exists('g:SortEditArgs')
 endif
 
 let g:DetectVeryMagicPattern = '\v%(%(\\\\)*)@>\\v'  " or '^\\v\>'
+let g:DetectSmartCasePattern = '\v%(%(\\\\)*)@>\\[cC]'
 let g:DetectVeryMagicBackslashEscapedPattern = '\v%(%(\\\\\\\\)*)@>\\\\v'  " or '^\\\\v\>'
 " The default matches even number of backslashes followed by v.
 
@@ -182,6 +186,43 @@ call s:VimGrep.__init__('g:VeryMagicVimGrep',
 	    \ '^\C\v(\s*%(vim%[grep]|lv%[imgrep])\s*)$')
 try
     call add(crdispatcher#CRDispatcher['callbacks'], s:VimGrep)
+catch /E121:/
+endtry  "}}}
+
+let s:SmartCaseVimGrep = copy(crdispatcher#CallbackClass) "{{{
+call s:SmartCaseVimGrep.__init__('g:SmartCaseVimGrep',
+	    \ ':',
+	    \ '^\C\v(\s*%(vim%[grep]|lv%[imgrep])\s*)$')
+fun! s:SmartCaseVimGrep.__transform_cmd__(dispatcher) dict
+    if !{self.variableName} || a:dispatcher.cmdtype !=# self.cmdtype
+	let a:dispatcher.state = 1
+	return
+    endif
+    let matched = a:dispatcher.cmd.cmd =~# self.pattern
+    if matched
+	let a:dispatcher.state = 1
+	let cmd = a:dispatcher.cmd
+	let cmd.args = self.__transform_args__(a:dispatcher, cmd.args)
+	let pat = cmd.pattern
+	let mlist = matchlist(pat, '\v^(\s*)(.{-})(\s*)$')
+	let pat = mlist[2]
+	let pat_len = len(pat)
+	if pat[0] ==# pat[len(pat)-1]
+	    let pat_len -= 2
+	    let char = pat[0]
+	    let pat = pat[1:len(pat)-2]
+	else
+	    let char = ''
+	endif
+	if pat_len > 0 && pat !~# g:DetectSmartCasePattern && pat =~# '\u'
+	    let cmd.pattern = mlist[1].char.'\C'.pat.char.mlist[3]
+	endif
+	let a:dispatcher.cmd = cmd
+	let a:dispatcher.cmdline = cmd.Join()
+    endif
+endfun
+try
+    call add(crdispatcher#CRDispatcher['callbacks'], s:SmartCaseVimGrep)
 catch /E121:/
 endtry  "}}}
 
