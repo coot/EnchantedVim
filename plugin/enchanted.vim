@@ -5,6 +5,9 @@
 if !exists('g:VeryMagic')
     let g:VeryMagic = 1
 endif
+if !exists('g:VeryMagicFilter')
+    let g:VeryMagicFilter = 0
+endif
 if !exists('g:VeryMagicSubstitute')
     let g:VeryMagicSubstitute = 0
 endif
@@ -301,7 +304,7 @@ fun! s:VeryMagicSearchArg(dispatcher)  "{{{
     endif
     let cmd = a:dispatcher.cmd
     let cmdline = cmd.cmd
-    let pat = g:vimlparsers#edit_cmd_pat . 
+    let pat = g:vimlparsers#edit_cmd_pat .
 		\ '(\s.{-})'.
 		\ '(\s@1<=\+/\S@=)'.
 		\ '(%(\S|%(%(%(%(\\\\)*)@>)\\)@10<=\s)+)'.
@@ -335,7 +338,7 @@ fun! s:VeryMagicHelpgrep(dispatcher)  "{{{
     endif
     let cmd = a:dispatcher.cmd
     let cm = cmd.cmd
-    let matches = matchlist(cm, '^\C\v(%(helpg%[rep]|lh%[elpgrep])\s*)(\S.*)') 
+    let matches = matchlist(cm, '^\C\v(%(helpg%[rep]|lh%[elpgrep])\s*)(\S.*)')
     if !empty(matches)
 	let l:c = matches[1]
 	let l:p = matches[2]
@@ -362,3 +365,38 @@ try
     call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicSubstituteNormalise'))
 catch /E121:/
 endtry  "}}}
+
+fun! s:VeryMagicFilter(dispatcher) "{{{
+  if !g:VeryMagicFilter
+    return
+  endif
+  echomsg a:dispatcher.cmds
+  for cmd in a:dispatcher.cmds
+    let decorators = []
+    for decorator in get(cmd, 'decorators', [])
+      let m = matchstr(decorator, 'filt\%[er]\s*')
+      if !empty(m)
+	if decorator[len(m):] =~ '\v([^[:ident:]]).{-}\1'
+	  let [x, pattern] = vimlparsers#ParsePattern(decorator[len(m):])
+	else
+	  let x = ''
+	  let pattern = matchstr(decorator[len(m):], '\v%([^ ]|\\ ){-}')
+	endif
+	if pattern =~ '^\\v'
+	  call add(decorators, decorator)
+	else
+	  call add(decorators, m . x . '\v' . pattern . x)
+	endif
+      else
+	call add(decorators, decorator)
+      endif
+    endfor
+    echomsg decorators
+    let cmd.decorators = decorators
+  endfor
+  let a:dispatcher.decorators = decorators
+endfun
+try
+  call add(crdispatcher#CRDispatcher['callbacks'], function('s:VeryMagicFilter'))
+catch /E121:/
+endtry "}}}
